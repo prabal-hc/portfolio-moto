@@ -41,19 +41,14 @@ export const rider = {
   boom: "crash!",
 };
 
-/** Skills, as a motorcycle spec sheet: each group is a part of the bike. */
+/** Skills, as a workshop tool wall: one tool per group. */
 export const specs = {
-  parts: [
-    { part: "engine", label: "Engine", note: "what powers everything", group: "Languages", items: ["JavaScript (ES6+)", "TypeScript", "HTML5", "CSS3", "SQL"] },
-    {
-      part: "tank",
-      label: "Bodywork",
-      note: "what people see",
-      group: "Frontend",
-      items: ["React.js", "Next.js", "Redux Toolkit", "Context API", "Tailwind CSS", "Three.js", "Vue.js"],
-    },
-    { part: "wheel", label: "Chassis", note: "what holds it all up", group: "Backend & APIs", items: ["REST APIs", "Supabase", "PostgreSQL", "Auth & RBAC", "RLS"] },
-    { part: "cockpit", label: "Cockpit", note: "how it's ridden", group: "Workflow", items: ["Git & GitHub", "Jira", "Agile / Scrum", "Testing", "AI-assisted dev"] },
+  note: "the toolbox",
+  tools: [
+    { tool: "wrench", group: "Languages", note: "what powers everything", items: ["JavaScript (ES6+)", "TypeScript", "HTML5", "CSS3", "SQL"] },
+    { tool: "screwdriver", group: "Frontend", note: "what people see", items: ["React.js", "Next.js", "Redux Toolkit", "Context API", "Tailwind CSS", "Three.js", "Vue.js"] },
+    { tool: "pliers", group: "Backend & APIs", note: "what holds it all up", items: ["REST APIs", "Supabase", "PostgreSQL", "Auth & RBAC", "RLS"] },
+    { tool: "hammer", group: "Workflow", note: "how it gets built", items: ["Git & GitHub", "Jira", "Agile / Scrum", "Testing", "AI-assisted dev"] },
   ] as const,
 };
 
