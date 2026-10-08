@@ -4,6 +4,9 @@ import { useRef, type ReactNode } from "react";
 import { rider } from "@/data/content";
 import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 import { smokeTrail } from "@/lib/smoke";
+import { unlockAudioOnFirstGesture } from "@/lib/audio";
+import { playCrash } from "@/lib/crashSound";
+import { buildWall, WALL } from "@/lib/stoneWall";
 import { Bike } from "./Bike";
 
 type ChipKey = keyof typeof rider.chips;
@@ -68,28 +71,31 @@ function Statement({ text }: { text: string }) {
   );
 }
 
-/** The wall, brick by brick: rows of tech names, every other row offset by half a brick like real brickwork. */
+const STONES = buildWall(rider.wall, rider.hot);
+
+/** The wall: a hand-drawn rubble-stone wall, the tech I use written on its biggest stones. Every stone is its own piece. */
 function Wall() {
-  const rows: string[][] = [];
-  for (let i = 0; i < rider.wall.length; i += 4) rows.push(rider.wall.slice(i, i + 4));
   return (
     <div className="wall" aria-hidden>
-      {rows.map((row, r) => (
-        <div key={r} className={`wall-row${r % 2 ? " wall-row-offset" : ""}`}>
-          {row.map((name) => (
-            <span key={name} className={`brick${rider.hot.includes(name) ? " brick-hot" : ""}`}>
-              {name}
-            </span>
-          ))}
-        </div>
-      ))}
+      <svg viewBox={`0 0 ${WALL.w} ${WALL.h}`} overflow="visible">
+        {STONES.map((st, i) => (
+          <g key={i} className={`stone${st.hot ? " stone-hot" : ""}`}>
+            <path d={st.d} />
+            {st.label && (
+              <text x={st.cx.toFixed(1)} y={(st.cy + st.size! * 0.32).toFixed(1)} fontSize={st.size!.toFixed(1)} textAnchor="middle">
+                {st.label}
+              </text>
+            )}
+          </g>
+        ))}
+      </svg>
     </div>
   );
 }
 
 /**
- * The rider: the bike that left the cover rides in from the left and crashes into a wall of the tech I use. The
- * bricks fly everywhere, and out of the mess the statement assembles itself, word by word. All scrubbed by the
+ * The rider: the bike that left the cover rides in from the left and crashes into a stone wall of the tech I use. The
+ * stones fly everywhere, and out of the mess the statement assembles itself, word by word. All scrubbed by the
  * scroll while the section holds still.
  */
 export default function Rider() {
@@ -99,6 +105,7 @@ export default function Rider() {
     () => {
       const el = root.current!;
       const q = gsap.utils.selector(el);
+      unlockAudioOnFirstGesture();
       if (prefersReducedMotion()) {
         gsap.set(q(".rider-scene"), { display: "none" });
         return;
@@ -121,7 +128,8 @@ export default function Rider() {
       tl.fromTo(bike, { x: () => -bike.offsetLeft - bw() - 40 }, { x: impactX, duration: 1, ease: "power1.in" }, 0);
       el.querySelectorAll<SVGGElement>(".rider-bike .bike-wheel").forEach((w) => tl.to(w, { rotation: 900, svgOrigin: w.dataset.origin, duration: 1.15, ease: "power1.in" }, 0));
 
-      // 2. impact: the scene shakes, the bike bucks up off its front wheel and bounces back, "crash!"
+      // 2. impact (with sound, only when riding forward into it): the scene shakes, the bike bucks up off its front wheel and bounces back, "crash!"
+      tl.call(() => void (tl.scrollTrigger?.direction === 1 && playCrash()), [], 1);
       tl.to(q(".rider-scene"), { keyframes: { x: [0, -16, 13, -9, 5, 0] }, duration: 0.3, ease: "none" }, 1)
         .to(bike, { x: () => impactX() - bw() * 0.14, rotation: 9, transformOrigin: "89% 96%", duration: 0.22, ease: "power2.out" }, 1)
         .to(bike, { rotation: 0, duration: 0.25, ease: "bounce.out" }, 1.22)
@@ -130,16 +138,18 @@ export default function Rider() {
         .to(q(".rider-boom"), { opacity: 0, y: -30, duration: 0.3 }, 1.55)
         .to(q(".rider-road"), { scaleX: 0, transformOrigin: "right", duration: 0.5, ease: "power2.in" }, 1.6);
 
-      // 3. the bricks fly: up and away in arcs, the ones nearest the bike first, tumbling as they go
-      q(".brick").forEach((b) => {
-        const r = (b as HTMLElement).getBoundingClientRect();
+      // 3. the stones fly: up and away in arcs, the ones nearest the bike first, tumbling as they go
+      const unit = () => wall.getBoundingClientRect().width / WALL.w || 1; // px per wall unit (stones move in SVG units)
+      gsap.set(q(".stone"), { transformOrigin: "50% 50%" });
+      q(".stone").forEach((b) => {
+        const r = b.getBoundingClientRect();
         const w = wall.getBoundingClientRect();
         const near = (r.left - w.left) / Math.max(w.width, 1); // 0 = the face the bike hits
         const at = 1 + near * 0.12 + random(0, 0.05);
         const up = random(0.25, 0.75);
-        tl.to(b, { x: () => random(-0.15, 0.75) * vw(), rotation: random(-300, 300), duration: 0.9, ease: "power1.out" }, at)
-          .to(b, { y: () => -up * vh(), duration: 0.38, ease: "power2.out" }, at)
-          .to(b, { y: () => (1 - up) * vh(), duration: 0.52, ease: "power2.in" }, at + 0.38)
+        tl.to(b, { x: () => (random(-0.15, 0.75) * vw()) / unit(), rotation: random(-300, 300), duration: 0.9, ease: "power1.out" }, at)
+          .to(b, { y: () => (-up * vh()) / unit(), duration: 0.38, ease: "power2.out" }, at)
+          .to(b, { y: () => ((1 - up) * vh()) / unit(), duration: 0.52, ease: "power2.in" }, at + 0.38)
           .to(b, { opacity: 0, duration: 0.3 }, at + 0.6);
       });
 

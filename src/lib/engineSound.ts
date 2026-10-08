@@ -1,5 +1,7 @@
 "use client";
 
+import { audio, noiseBuffer } from "./audio";
+
 /**
  * A single-cylinder motorcycle starting up, synthesised with the Web Audio API (no audio file needed):
  * starter-motor whirr → the engine catches → a throttle blip → a lazy idle thump → fade out.
@@ -10,8 +12,6 @@
 /** Timeline of the sound, in seconds from the click (the cover animation is timed to match). */
 export const ENGINE = { crankEnd: 0.55, revStart: 1.0, revPeak: 1.32, idleFrom: 1.8, fadeFrom: 2.6, end: 3.3 };
 
-let ctx: AudioContext | null = null;
-let noise: AudioBuffer | null = null;
 
 /** Firing pulses per second at time t: a single cylinder at idle fires ~13 times a second. */
 function rate(t: number) {
@@ -43,11 +43,7 @@ function synth(c: AudioContext) {
   comp.ratio.value = 6;
   out.connect(comp).connect(c.destination);
 
-  if (!noise) {
-    noise = c.createBuffer(1, c.sampleRate, c.sampleRate);
-    const d = noise.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  }
+  const noise = noiseBuffer(c);
 
   // 1. starter motor: a buzzy whirr with a fast tremolo
   const starter = c.createOscillator();
@@ -130,11 +126,9 @@ function synth(c: AudioContext) {
  * start audio while it is handling the click. Each click plays it once.
  */
 export function playEngineStart() {
-  if (typeof window === "undefined") return;
+  const c = audio();
+  if (!c) return;
   try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    ctx ??= new Ctx();
-    const c = ctx;
     if (c.state === "suspended") void c.resume().then(() => synth(c));
     else synth(c);
   } catch {
