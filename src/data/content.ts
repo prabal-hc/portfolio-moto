@@ -21,23 +21,19 @@ export const cover = {
 };
 
 export const rider = {
-  kicker: "Nº 01 — The rider",
   // {key} = a sticker chip (defined below), *starred* = serif italics
   statement:
-    "I build {react} interfaces that load fast, look sharp and ride *smooth.* {years} of shipping with {next} and {ts} — and off the clock, I'm out on my\u00a0{hunter}",
+    "I build {react} interfaces that load fast, look sharp and ride *smooth.* {years} of shipping with {next} and {ts}.",
   chips: {
     react: { label: "React", icon: "react", tilt: -4 },
     years: { label: "2.5+ years", tone: "orange", tilt: 3 },
     next: { label: "Next.js", icon: "next", tilt: -3 },
     ts: { label: "TypeScript", icon: "ts", tilt: 4 },
-    hunter: { label: "Hunter 350", icon: "helmet", tone: "ink", tilt: -5 },
   },
-  note: "still loving every km",
-}
+};
 
 /** Skills, as a motorcycle spec sheet: each group is a part of the bike. */
 export const specs = {
-  kicker: "Nº 02 — Specifications",
   title: "Under the hood.",
   edition: "Prabal Holla · 2026 edition",
   parts: [
@@ -55,7 +51,6 @@ export const specs = {
 };
 
 export const garage = {
-  kicker: "Nº 03 — The garage",
   title: "Built in this garage.",
   note: "things I've put miles on",
   items: [
@@ -87,7 +82,6 @@ export const garage = {
 
 /** The journey, oldest first: the road runs from the start line to now. */
 export const route = {
-  kicker: "Nº 04 — The route",
   title: "Every stop on the way here.",
   start: "B.E. Information Science & Engineering · Jyothy Institute of Technology · 2023",
   stops: [
@@ -119,7 +113,6 @@ export const route = {
 };
 
 export const ride = {
-  kicker: "Nº 05 — Let's ride",
   title: ["Let's", "ride."],
   body: "Open to new frontend roles and interesting projects. Tell me what you're building.",
   note: "I reply fast",

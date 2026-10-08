@@ -15,7 +15,6 @@ export default function Garage() {
   useGSAP(
     () => {
       if (prefersReducedMotion()) return;
-      gsap.fromTo(".garage .kicker-rule", { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: root.current, start: "top 80%" } });
       gsap.from(".garage .title .ch", { yPercent: 110, duration: 1, ease: "expo.out", stagger: 0.025, scrollTrigger: { trigger: ".garage .title", start: "top 85%" } });
       gsap.fromTo(".garage-note .arrow path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, stagger: 0.15, scrollTrigger: { trigger: ".garage-note", start: "top 85%" } });
       // cards swing in from a steeper angle and settle at their resting tilt
@@ -35,10 +34,6 @@ export default function Garage() {
 
   return (
     <section className="garage section" id="garage" ref={root} aria-label="Work">
-      <p className="kicker">
-        <span className="kicker-rule" aria-hidden />
-        {garage.kicker}
-      </p>
       <div className="garage-head">
         <h2 className="title" aria-label={garage.title}>
           <Chars text={garage.title.toUpperCase()} />
@@ -54,7 +49,7 @@ export default function Garage() {
           const inner = (
             <>
               <div className="garage-card-top">
-                <span className="garage-no">Nº {String(i + 1).padStart(2, "0")}</span>
+                <span className="garage-no">{String(i + 1).padStart(2, "0")}</span>
                 <span className="plate">KA · 01 · PH · {String(i + 1).padStart(2, "0")}</span>
               </div>
               <h3 className="garage-name">{p.name}</h3>

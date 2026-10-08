@@ -1,4 +1,4 @@
-# Issue Nº 01 — Prabal Holla
+# Prabal Holla — portfolio
 
 A portfolio set as a vintage motorcycle magazine, built around a line-art Royal Enfield Hunter 350 that draws
 itself in ink as you scroll. Warm paper, ink and orange; poster headlines, editorial serif, handwritten notes.

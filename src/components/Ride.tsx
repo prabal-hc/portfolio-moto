@@ -42,10 +42,6 @@ export default function Ride() {
     <section className="ride" id="ride" ref={root} aria-label="Contact">
       <Marquee items={ride.marquee} tone="orange" />
       <div className="ride-inner">
-        <p className="kicker kicker-light">
-          <span className="kicker-rule" aria-hidden />
-          {ride.kicker}
-        </p>
         <div className="ride-hero">
           <h2 className="ride-title" aria-label={ride.title.join(" ")}>
             {letters(ride.title[0])}
@@ -72,7 +68,7 @@ export default function Ride() {
         </div>
         <footer className="footer">
           <span>© 2026 {profile.name}</span>
-          <span>Issue Nº 01 — designed &amp; built in {profile.location}</span>
+          <span>Designed &amp; built in {profile.location}</span>
           <span>Next.js · GSAP · Lenis</span>
         </footer>
       </div>

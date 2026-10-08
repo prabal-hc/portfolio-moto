@@ -80,10 +80,6 @@ export default function Specs() {
   return (
     <section className="specs section" id="specs" ref={root} aria-label="Skills">
       <div className="specs-head">
-        <p className="kicker">
-          <span className="kicker-rule" aria-hidden />
-          {specs.kicker}
-        </p>
         <h2 className="title">{specs.title}</h2>
         <p className="specs-edition">{specs.edition}</p>
       </div>

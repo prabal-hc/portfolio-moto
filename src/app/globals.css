@@ -65,23 +65,6 @@ body::after {
   color: var(--orange);
   line-height: 1;
 }
-.kicker {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--orange);
-}
-.kicker-rule {
-  display: block;
-  width: 56px;
-  height: 1px;
-  background: currentColor;
-  transform-origin: left;
-}
 .title {
   font-family: var(--display);
   font-weight: 800;
@@ -89,7 +72,6 @@ body::after {
   line-height: 0.95;
   text-transform: uppercase;
   letter-spacing: -0.045em;
-  margin-top: 18px;
   overflow: hidden;
   padding-bottom: 0.04em;
 }
@@ -401,7 +383,6 @@ body::after {
 }
 .rider-statement {
   max-width: 17.5em;
-  margin-top: clamp(36px, 5vw, 70px);
   font-family: var(--display);
   font-weight: 700;
   font-size: clamp(32px, 4.3vw, 76px);
@@ -415,9 +396,6 @@ body::after {
   font-style: italic;
   letter-spacing: -0.01em;
   color: var(--orange);
-}
-.rider-statement .glue {
-  white-space: nowrap;
 }
 .chip {
   display: inline-flex;
@@ -443,11 +421,6 @@ body::after {
   color: var(--paper);
   background: var(--orange);
 }
-.chip-ink {
-  color: var(--paper);
-  background: var(--ink);
-  box-shadow: 3px 3px 0 var(--orange);
-}
 .chip-icon {
   display: block;
   width: 1.3em;
@@ -457,28 +430,6 @@ body::after {
   display: block;
   width: 100%;
   height: 100%;
-}
-.chip .helmet path {
-  stroke-width: 14;
-  stroke-dashoffset: 0 !important;
-}
-.rider-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  margin-top: clamp(4px, 1vw, 14px);
-  transform: translateX(clamp(120px, 16vw, 300px));
-}
-.rider-note .arrow {
-  width: 70px;
-  transform: scaleX(-1) rotate(-60deg);
-}
-.rider-note-text {
-  display: block;
-  font-size: clamp(24px, 2.2vw, 36px);
-  color: var(--orange);
-  transform: rotate(-5deg);
-  margin-top: 30px;
 }
 
 /* ---------- specifications ---------- */
@@ -490,9 +441,6 @@ body::after {
   grid-template-columns: 1fr auto;
   align-items: end;
   column-gap: 24px;
-}
-.specs-head .kicker {
-  grid-column: 1 / -1;
 }
 .specs-edition {
   font-family: var(--mono);
@@ -1014,9 +962,6 @@ a.garage-card-in:hover .garage-go {
   .cover-cue .arrow {
     width: 48px;
     transform: rotate(-110deg) translateY(6px);
-  }
-  .rider-note {
-    transform: translateX(18vw);
   }
   .specs-head {
     grid-template-columns: 1fr;

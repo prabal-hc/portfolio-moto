@@ -22,7 +22,6 @@ export default function Route() {
         gsap.set(".road-reveal", { attr: { height: 1000 } });
         return;
       }
-      gsap.fromTo(".route .kicker-rule", { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: root.current, start: "top 80%" } });
       gsap.from(".route .title .ch", { yPercent: 110, duration: 1, ease: "expo.out", stagger: 0.025, scrollTrigger: { trigger: ".route .title", start: "top 85%" } });
       // the road paints itself down the page as you ride along it
       gsap.fromTo(
@@ -39,10 +38,6 @@ export default function Route() {
 
   return (
     <section className="route section" id="route" ref={root} aria-label="Journey">
-      <p className="kicker">
-        <span className="kicker-rule" aria-hidden />
-        {route.kicker}
-      </p>
       <h2 className="title" aria-label={route.title}>
         <Chars text={route.title.toUpperCase()} />
       </h2>

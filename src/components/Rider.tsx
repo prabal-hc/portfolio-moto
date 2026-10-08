@@ -3,7 +3,6 @@
 import { useRef, type ReactNode } from "react";
 import { rider } from "@/data/content";
 import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
-import { Arrow, Helmet } from "./Doodles";
 
 type ChipKey = keyof typeof rider.chips;
 
@@ -29,7 +28,6 @@ const ICONS: Record<string, ReactNode> = {
       <path d="M9 18 H19 M14 18 V31 M31 19 C29 17 24 17 24 20.5 C24 24 31 23 31 27 C31 31 26 31 23.5 29" />
     </svg>
   ),
-  helmet: <Helmet />,
 };
 
 function Chip({ k }: { k: ChipKey }) {
@@ -52,16 +50,6 @@ function Statement({ text }: { text: string }) {
     <p className="rider-statement" aria-label={text.replace(/\{(\w+)\}/g, (_, k: ChipKey) => rider.chips[k].label).replace(/\*/g, "")}>
       {parts.map((part, pi) => {
         if (part.startsWith("{")) return <Chip key={pi} k={part.slice(1, -1) as ChipKey} />;
-        const glued = part.match(/^(\S+)\u00a0\{(\w+)\}$/);
-        if (glued)
-          return (
-            <span key={pi} className="glue">
-              <span className="w" aria-hidden>
-                {glued[1]}
-              </span>{" "}
-              <Chip k={glued[2] as ChipKey} />
-            </span>
-          );
         const accent = part.startsWith("*");
         const raw = accent ? part.slice(1, -1) : part;
         return raw.split(/(\s+)/).map((w, wi) =>
@@ -85,7 +73,6 @@ export default function Rider() {
     () => {
       if (prefersReducedMotion()) return;
       const el = root.current!;
-      gsap.fromTo(".rider .kicker-rule", { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 80%" } });
 
       // scrubbed by the scroll: words ink in one after another, and each sticker slaps onto the page as it's reached
       const tl = gsap.timeline({ scrollTrigger: { trigger: ".rider-statement", start: "top 80%", end: "bottom 50%", scrub: 0.5 } });
@@ -94,26 +81,13 @@ export default function Rider() {
           tl.fromTo(node, { scale: 0, rotate: -30 }, { scale: 1, rotate: () => node.style.getPropertyValue("--tilt"), duration: 1.6, ease: "back.out(2.4)" }, i * 0.35);
         else tl.fromTo(node, { opacity: 0.14 }, { opacity: 1, duration: 0.6, ease: "none" }, i * 0.35);
       });
-
-      gsap
-        .timeline({ scrollTrigger: { trigger: ".rider-note", start: "top 92%" } })
-        .fromTo(".rider-note .arrow path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, stagger: 0.15, ease: "power2.out" })
-        .from(".rider-note-text", { opacity: 0, rotate: -12, duration: 0.6, ease: "back.out(2)" }, "<0.2");
     },
     { scope: root },
   );
 
   return (
     <section className="rider section" id="rider" ref={root} aria-label="About">
-      <p className="kicker">
-        <span className="kicker-rule" aria-hidden />
-        {rider.kicker}
-      </p>
       <Statement text={rider.statement} />
-      <p className="rider-note" aria-hidden>
-        <Arrow />
-        <span className="rider-note-text hand">{rider.note}</span>
-      </p>
     </section>
   );
 }

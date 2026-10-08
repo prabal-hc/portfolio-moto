@@ -15,7 +15,7 @@ const mono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"], weigh
 const SITE = "https://prabalholla-moto.netlify.app";
 const TITLE = "Prabal Holla — Frontend Developer";
 const DESCRIPTION =
-  "Issue Nº 01: a frontend developer from Bangalore who builds fast, detailed interfaces in React, Next.js and TypeScript, and rides a Hunter 350.";
+  "A frontend developer from Bangalore who builds fast, detailed interfaces in React, Next.js and TypeScript, and rides a Hunter 350.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
