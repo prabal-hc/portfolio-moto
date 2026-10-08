@@ -11,14 +11,13 @@ export const profile = {
   ],
 };
 
-/** The cover. The rotating line finishes the sentence "Frontend developer who …". */
+/** The cover: one statement, one friendly line, and the bike to play with. */
 export const cover = {
-  issue: "Issue Nº 01",
-  edition: "The Frontend Issue · 2026",
-  place: "Bangalore, IN",
-  lead: "Frontend developer who",
-  rotating: ["builds fast interfaces.", "sweats the details.", "ships on time.", "rides a Hunter 350."],
-  note: "my other office",
+  intro: "Hi, I'm Prabal — a frontend developer in Bangalore",
+  // each line is set on its own, slightly tilted; the last word is in orange
+  headline: ["Websites", "built to", "ride smooth"],
+  cue: "click to start the engine",
+  vroom: "vroom!",
 };
 
 export const rider = {

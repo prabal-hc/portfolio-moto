@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Instrument_Serif, Caveat, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Serif, Caveat, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-// Masthead headlines: a tall, condensed poster face.
-const display = Anton({ variable: "--font-display", subsets: ["latin"], weight: "400" });
+// Headlines: a wide, heavy grotesk with a hand-made quirk.
+const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"], weight: ["500", "700", "800"] });
 // Editorial statements and body copy.
 const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400", style: ["normal", "italic"] });
 // Handwritten notes in the margins.
