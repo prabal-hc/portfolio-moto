@@ -40,8 +40,6 @@ export default function Specs() {
           { strokeDashoffset: 1 },
           { strokeDashoffset: 0, ease: "none", stagger: 0.01, scrollTrigger: { trigger: ".specs-figure", start: "top 85%", end: "top 25%", scrub: 0.6 } },
         );
-        const counter = el.querySelector<HTMLElement>(".specs-counter-now");
-        const name = el.querySelector<HTMLElement>(".specs-counter-name");
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: ".specs-stage",
@@ -49,11 +47,6 @@ export default function Specs() {
             end: "+=320%",
             pin: true,
             scrub: 0.6,
-            onUpdate: (self) => {
-              const k = Math.min(specs.parts.length - 1, Math.floor(self.progress * specs.parts.length * 0.999));
-              if (counter) counter.textContent = String(k + 1).padStart(2, "0");
-              if (name) name.textContent = specs.parts[k].label;
-            },
           },
         });
         specs.parts.forEach((p, k) => {
@@ -79,17 +72,7 @@ export default function Specs() {
 
   return (
     <section className="specs section" id="specs" ref={root} aria-label="Skills">
-      <div className="specs-head">
-        <h2 className="title">{specs.title}</h2>
-        <p className="specs-edition">{specs.edition}</p>
-      </div>
-
       <div className="specs-stage">
-        <div className="specs-counter" aria-hidden>
-          <span className="specs-counter-now">01</span> / {String(specs.parts.length).padStart(2, "0")} —{" "}
-          <span className="specs-counter-name">{specs.parts[0].label}</span>
-        </div>
-
         <div className="specs-figure" style={{ aspectRatio: `1000 / ${FIG_H}` }}>
           <div className="specs-bike" style={{ top: pct(BIKE_Y, FIG_H), height: pct(560, FIG_H) }}>
             <Bike title="Hunter 350 line drawing, labelled with skills" />

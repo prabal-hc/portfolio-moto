@@ -533,21 +533,8 @@ body::after {
 
 /* ---------- specifications ---------- */
 .specs {
+  padding-top: clamp(40px, 5vw, 80px);
   padding-bottom: 0;
-}
-.specs-head {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: end;
-  column-gap: 24px;
-}
-.specs-edition {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding-bottom: 1.4vw;
-  color: var(--ink-2);
 }
 .specs-stage {
   position: relative;
@@ -556,18 +543,6 @@ body::after {
   align-items: center;
   justify-content: center;
   padding: 84px 0 24px;
-}
-.specs-counter {
-  position: absolute;
-  top: 88px;
-  left: 0;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-.specs-counter-now {
-  color: var(--orange);
 }
 .specs-figure {
   position: relative;
@@ -990,7 +965,6 @@ a.garage-card-in:hover .garage-go {
     display: block;
     padding: 40px 0 0;
   }
-  .specs-counter,
   .specs-leaders {
     display: none;
   }
@@ -1069,9 +1043,6 @@ a.garage-card-in:hover .garage-go {
   .cover-cue .arrow {
     width: 48px;
     transform: rotate(-110deg) translateY(6px);
-  }
-  .specs-head {
-    grid-template-columns: 1fr;
   }
   .garage-head {
     flex-direction: column;

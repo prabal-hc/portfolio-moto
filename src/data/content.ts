@@ -43,8 +43,6 @@ export const rider = {
 
 /** Skills, as a motorcycle spec sheet: each group is a part of the bike. */
 export const specs = {
-  title: "Under the hood.",
-  edition: "Prabal Holla · 2026 edition",
   parts: [
     { part: "engine", label: "Engine", note: "what powers everything", group: "Languages", items: ["JavaScript (ES6+)", "TypeScript", "HTML5", "CSS3", "SQL"] },
     {
