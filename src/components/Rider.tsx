@@ -3,6 +3,8 @@
 import { useRef, type ReactNode } from "react";
 import { rider } from "@/data/content";
 import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
+import { smokeTrail } from "@/lib/smoke";
+import { Bike } from "./Bike";
 
 type ChipKey = keyof typeof rider.chips;
 
@@ -66,27 +68,107 @@ function Statement({ text }: { text: string }) {
   );
 }
 
+/** The wall, brick by brick: rows of tech names, every other row offset by half a brick like real brickwork. */
+function Wall() {
+  const rows: string[][] = [];
+  for (let i = 0; i < rider.wall.length; i += 4) rows.push(rider.wall.slice(i, i + 4));
+  return (
+    <div className="wall" aria-hidden>
+      {rows.map((row, r) => (
+        <div key={r} className={`wall-row${r % 2 ? " wall-row-offset" : ""}`}>
+          {row.map((name) => (
+            <span key={name} className={`brick${rider.hot.includes(name) ? " brick-hot" : ""}`}>
+              {name}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The rider: the bike that left the cover rides in from the left and crashes into a wall of the tech I use. The
+ * bricks fly everywhere, and out of the mess the statement assembles itself, word by word. All scrubbed by the
+ * scroll while the section holds still.
+ */
 export default function Rider() {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) return;
       const el = root.current!;
+      const q = gsap.utils.selector(el);
+      if (prefersReducedMotion()) {
+        gsap.set(q(".rider-scene"), { display: "none" });
+        return;
+      }
+      const bike = q(".rider-bike")[0] as HTMLElement;
+      const wall = q(".wall")[0] as HTMLElement;
+      const bw = () => bike.offsetWidth;
+      // where the front tyre (~89% of the drawing's width) meets the wall
+      const impactX = () => wall.offsetLeft - bike.offsetLeft - bw() * 0.89;
+      const { random } = gsap.utils;
+      const vw = () => window.innerWidth;
+      const vh = () => window.innerHeight;
 
-      // scrubbed by the scroll: words ink in one after another, and each sticker slaps onto the page as it's reached
-      const tl = gsap.timeline({ scrollTrigger: { trigger: ".rider-statement", start: "top 80%", end: "bottom 50%", scrub: 0.5 } });
-      el.querySelectorAll<HTMLElement>(".rider-statement .w, .rider-statement .chip").forEach((node, i) => {
-        if (node.classList.contains("chip"))
-          tl.fromTo(node, { scale: 0, rotate: -30 }, { scale: 1, rotate: () => node.style.getPropertyValue("--tilt"), duration: 1.6, ease: "back.out(2.4)" }, i * 0.35);
-        else tl.fromTo(node, { opacity: 0.14 }, { opacity: 1, duration: 0.6, ease: "none" }, i * 0.35);
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: el, start: "top top", end: "+=300%", pin: true, scrub: 0.6, invalidateOnRefresh: true },
+        onUpdate: smokeTrail(bike, q(".rider-smoke")[0] as HTMLElement),
       });
+
+      // 1. ride in from off-screen left, wheels turning
+      tl.fromTo(bike, { x: () => -bike.offsetLeft - bw() - 40 }, { x: impactX, duration: 1, ease: "power1.in" }, 0);
+      el.querySelectorAll<SVGGElement>(".rider-bike .bike-wheel").forEach((w) => tl.to(w, { rotation: 900, svgOrigin: w.dataset.origin, duration: 1.15, ease: "power1.in" }, 0));
+
+      // 2. impact: the scene shakes, the bike bucks up off its front wheel and bounces back, "crash!"
+      tl.to(q(".rider-scene"), { keyframes: { x: [0, -16, 13, -9, 5, 0] }, duration: 0.3, ease: "none" }, 1)
+        .to(bike, { x: () => impactX() - bw() * 0.14, rotation: 9, transformOrigin: "89% 96%", duration: 0.22, ease: "power2.out" }, 1)
+        .to(bike, { rotation: 0, duration: 0.25, ease: "bounce.out" }, 1.22)
+        .to(bike, { opacity: 0, duration: 0.35 }, 1.7)
+        .fromTo(q(".rider-boom"), { opacity: 0, scale: 0.4, rotate: -20 }, { opacity: 1, scale: 1, rotate: -8, duration: 0.18, ease: "back.out(3)" }, 1)
+        .to(q(".rider-boom"), { opacity: 0, y: -30, duration: 0.3 }, 1.55)
+        .to(q(".rider-road"), { scaleX: 0, transformOrigin: "right", duration: 0.5, ease: "power2.in" }, 1.6);
+
+      // 3. the bricks fly: up and away in arcs, the ones nearest the bike first, tumbling as they go
+      q(".brick").forEach((b) => {
+        const r = (b as HTMLElement).getBoundingClientRect();
+        const w = wall.getBoundingClientRect();
+        const near = (r.left - w.left) / Math.max(w.width, 1); // 0 = the face the bike hits
+        const at = 1 + near * 0.12 + random(0, 0.05);
+        const up = random(0.25, 0.75);
+        tl.to(b, { x: () => random(-0.15, 0.75) * vw(), rotation: random(-300, 300), duration: 0.9, ease: "power1.out" }, at)
+          .to(b, { y: () => -up * vh(), duration: 0.38, ease: "power2.out" }, at)
+          .to(b, { y: () => (1 - up) * vh(), duration: 0.52, ease: "power2.in" }, at + 0.38)
+          .to(b, { opacity: 0, duration: 0.3 }, at + 0.6);
+      });
+
+      // 4. out of the mess, the statement: each word flies in from somewhere and drops into place
+      q(".rider-statement .w, .rider-statement .chip").forEach((node, i) => {
+        const chip = (node as HTMLElement).classList.contains("chip");
+        tl.fromTo(
+          node,
+          { x: () => random(-0.45, 0.45) * vw(), y: () => random(-0.4, 0.4) * vh(), rotation: random(-120, 120), opacity: 0, scale: chip ? 0.3 : 1 },
+          { x: 0, y: 0, rotation: chip ? () => (node as HTMLElement).style.getPropertyValue("--tilt") : 0, opacity: 1, scale: 1, duration: 0.7, ease: chip ? "back.out(1.6)" : "power3.out" },
+          1.5 + i * 0.035,
+        );
+      });
+      tl.to({}, { duration: 0.4 }); // a beat to read it before the page moves on
     },
     { scope: root },
   );
 
   return (
-    <section className="rider section" id="rider" ref={root} aria-label="About">
+    <section className="rider" id="rider" ref={root} aria-label="About">
+      <div className="rider-scene" aria-hidden>
+        <div className="rider-road" />
+        <Wall />
+        <div className="rider-smoke" />
+        <div className="rider-bike">
+          <Bike title="" />
+        </div>
+        <span className="rider-boom hand">{rider.boom}</span>
+      </div>
       <Statement text={rider.statement} />
     </section>
   );

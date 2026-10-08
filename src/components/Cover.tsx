@@ -6,6 +6,7 @@ import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 import { Bike } from "./Bike";
 import { Arrow } from "./Doodles";
 import { ENGINE, playEngineStart } from "@/lib/engineSound";
+import { smokeTrail } from "@/lib/smoke";
 
 /** Where the exhaust puffs come out, in the bike drawing's own units (the silencer tip, at the back). */
 const PUFFS = [
@@ -13,28 +14,6 @@ const PUFFS = [
   { x: 236, y: 432, r: 22 },
   { x: 186, y: 416, r: 28 },
 ];
-
-/** One puff of exhaust left behind at the silencer tip, drifting back and up as it fades. */
-function puffAt(bike: HTMLElement, layer: HTMLElement, back = 0) {
-  if (layer.childElementCount > 40) return;
-  const b = bike.getBoundingClientRect();
-  const l = layer.getBoundingClientRect();
-  const size = b.width * gsap.utils.random(0.03, 0.055);
-  const d = document.createElement("span");
-  d.className = "smoke";
-  Object.assign(d.style, {
-    width: `${size}px`,
-    height: `${size}px`,
-    left: `${b.left - l.left - back + b.width * (PUFFS[0].x / 1000) - size / 2}px`,
-    top: `${b.top - l.top + b.height * (PUFFS[0].y / 560) - size / 2}px`,
-  });
-  layer.appendChild(d);
-  gsap.fromTo(
-    d,
-    { scale: 0.3, opacity: 0.9 },
-    { scale: gsap.utils.random(1.6, 2.6), opacity: 0, x: gsap.utils.random(-70, -20), y: gsap.utils.random(-50, -15), duration: gsap.utils.random(0.9, 1.4), ease: "power2.out", onComplete: () => d.remove() },
-  );
-}
 
 /**
  * The cover: one statement set big and loose, the bike underneath as the thing to play with. Click it and it
@@ -66,18 +45,9 @@ export default function Cover() {
       const bike = el.querySelector<HTMLElement>(".cover-bike")!;
       const smoke = el.querySelector<HTMLElement>(".cover-smoke")!;
       const restLeft = () => bike.getBoundingClientRect().left - (gsap.getProperty(bike, "x") as number);
-      let lastPuffX = 0;
       const ride = gsap.timeline({
         scrollTrigger: { trigger: el, start: "top top", end: "+=110%", pin: true, scrub: 0.6, invalidateOnRefresh: true },
-        onUpdate: () => {
-          const x = gsap.getProperty(bike, "x") as number;
-          if (x < lastPuffX) lastPuffX = x; // riding back up: no smoke, just keep the counter honest
-          if (x <= 2) return;
-          // one puff every ~34px of road; a fast scroll covers more in a frame, so fill in the gaps behind
-          const gap = Math.min(Math.floor((x - lastPuffX) / 34), 4);
-          for (let i = gap - 1; i >= 0; i--) puffAt(bike, smoke, i * 34);
-          if (gap > 0) lastPuffX = x;
-        },
+        onUpdate: smokeTrail(bike, smoke),
       });
       ride
         .to(bike, { x: () => window.innerWidth - restLeft() + 40, ease: "power1.in" }, 0)

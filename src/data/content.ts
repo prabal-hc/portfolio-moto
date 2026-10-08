@@ -30,6 +30,15 @@ export const rider = {
     next: { label: "Next.js", icon: "next", tilt: -3 },
     ts: { label: "TypeScript", icon: "ts", tilt: 4 },
   },
+  // the wall the bike crashes into: four bricks a row
+  wall: [
+    "JavaScript", "TypeScript", "React", "Next.js",
+    "HTML5", "CSS3", "Tailwind", "Redux",
+    "Supabase", "PostgreSQL", "REST APIs", "Three.js",
+    "Vue.js", "Git", "GSAP", "SQL",
+  ],
+  hot: ["React", "Next.js", "TypeScript"],
+  boom: "crash!",
 };
 
 /** Skills, as a motorcycle spec sheet: each group is a part of the bike. */

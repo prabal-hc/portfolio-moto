@@ -376,10 +376,94 @@ body::after {
 
 /* ---------- the rider: one centred statement with sticker chips ---------- */
 .rider {
+  --bw: min(30vw, 400px, 46vh); /* the bike's width */
+  --brick: clamp(80px, 8vw, 124px);
+  --brick-h: clamp(40px, 4.2vw, 62px);
+  --ground: 14%;
+  position: relative;
+  height: 100svh;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding-bottom: clamp(60px, 8vw, 130px);
+  justify-content: center;
+  padding: 0 var(--gutter);
+  overflow: hidden;
+}
+.rider-statement {
+  position: relative;
+  z-index: 3;
+}
+.rider-statement .w {
+  display: inline-block; /* so each word can fly in on its own */
+}
+/* the crash: a road, a wall of tech bricks, the bike, a handwritten "crash!" */
+.rider-scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.rider-road {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--ground);
+  border-top: 1.5px solid var(--ink);
+}
+.wall {
+  position: absolute;
+  left: 52%;
+  bottom: var(--ground);
+  z-index: 2;
+}
+.wall-row {
+  display: flex;
+}
+.wall-row-offset {
+  margin-left: calc(var(--brick) / 2);
+}
+.brick {
+  display: grid;
+  place-items: center;
+  width: var(--brick);
+  height: var(--brick-h);
+  margin: 0 -1px -2px 0; /* neighbours share their mortar lines */
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: var(--paper);
+  font-family: var(--mono);
+  font-size: clamp(9px, 0.9vw, 14px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.brick-hot {
+  background: var(--orange);
+  color: var(--paper);
+}
+.rider-smoke {
+  position: absolute;
+  inset: 0;
+}
+.rider-bike {
+  position: absolute;
+  left: 6%;
+  bottom: calc(var(--ground) - var(--bw) * 0.02);
+  width: var(--bw);
+  z-index: 1;
+}
+.js .rider-bike .bike .ink:not(.dashed) {
+  stroke-dashoffset: 0;
+}
+.rider-bike .bike-road {
+  display: none;
+}
+.rider-boom {
+  position: absolute;
+  left: 40%;
+  bottom: calc(var(--ground) + var(--brick-h) * 3);
+  z-index: 4;
+  font-size: clamp(36px, 4vw, 64px);
+  color: var(--orange);
+  opacity: 0;
 }
 .rider-statement {
   max-width: 17.5em;
@@ -915,6 +999,19 @@ a.garage-card-in:hover .garage-go {
   }
 }
 @media (max-width: 760px) {
+  .rider {
+    --bw: 36vw;
+    --brick: 15vw;
+    --brick-h: 9vw;
+    --ground: 18%;
+  }
+  .wall {
+    left: 30%;
+  }
+  .brick {
+    font-size: 7.5px;
+    letter-spacing: 0;
+  }
   .nav-links a:not(.nav-cta) {
     display: none;
   }
