@@ -762,23 +762,36 @@ body::after {
   inset: 0;
   display: flex;
   align-items: center;
-  padding: 40px clamp(16px, 3vw, 52px) 28px;
-  overflow-y: auto;
+  overflow: hidden;
   background:
     radial-gradient(ellipse 70% 50% at 50% 0%, rgba(232, 80, 28, 0.3), transparent 70%),
     var(--ink);
 }
+/* one row of projects; the first starts in the middle and the row slides left past the others */
 .garage-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(16px, 2.4vw, 36px);
-  width: 100%;
-  max-width: 1100px;
-  margin: auto;
+  --card-w: min(62vw, 760px);
+  display: flex;
+  align-items: center;
+  gap: clamp(28px, 5vw, 90px);
+  padding-left: calc(50% - var(--card-w) / 2);
   list-style: none;
 }
 .garage-card {
+  flex: 0 0 var(--card-w);
   transform: rotate(var(--tilt));
+}
+.garage-count {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: rgba(241, 233, 220, 0.6);
+}
+.garage-count-now {
+  color: var(--orange);
 }
 .garage-card-in {
   display: flex;
@@ -814,10 +827,10 @@ a.garage-card-in:focus-visible {
   letter-spacing: 0.1em;
 }
 .garage-name {
-  margin-top: clamp(14px, 1.6vw, 26px);
+  margin-top: clamp(18px, 2.2vw, 40px);
   font-family: var(--display);
   font-weight: 800;
-  font-size: clamp(22px, 2.3vw, 38px);
+  font-size: clamp(26px, 3.4vw, 54px);
   letter-spacing: -0.03em;
   line-height: 0.96;
   text-transform: uppercase;
@@ -834,7 +847,7 @@ a.garage-card-in:focus-visible {
   flex: 1;
   margin-top: 10px;
   font-family: var(--serif);
-  font-size: clamp(15px, 1.2vw, 19px);
+  font-size: clamp(16px, 1.5vw, 22px);
   line-height: 1.4;
   color: var(--ink-2);
 }
@@ -1192,20 +1205,8 @@ a.garage-card-in:hover .garage-go {
     transform: rotate(-110deg) translateY(6px);
   }
   .garage-cards {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .garage-inside {
-    padding: 34px 14px 14px;
-  }
-  .garage-name {
-    margin-top: 10px;
-  }
-  .garage-go {
-    margin-top: 10px;
-  }
-  .garage-blurb {
-    display: none;
+    --card-w: 80vw;
+    gap: 20px;
   }
   .garage-note {
     display: none;

@@ -11,7 +11,7 @@ const TILT = [-1.6, 1.2, 1.4, -1.1];
 
 /**
  * The work, behind one big garage door. The section holds still while the scroll zooms in on the door until
- * it fills the screen; then the roller shutter rattles up and the projects are there inside, under the lamp.
+ * it fills the screen; then the roller shutter rattles up and the projects slide past inside, one at a time, under the lamp.
  */
 export default function Garage() {
   const root = useRef<HTMLElement>(null);
@@ -30,16 +30,35 @@ export default function Garage() {
         playShutter(0.8);
       };
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=260%", pin: true, scrub: 0.6 } });
+      const cards = q(".garage-card") as HTMLElement[];
+      const track = q(".garage-cards")[0] as HTMLElement;
+      const count = q(".garage-count-now")[0];
+      // how far the row has to slide to bring card k to the middle
+      const offset = (k: number) => -(cards[k].offsetLeft - cards[0].offsetLeft);
+
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: root.current, start: "top top", end: `+=${260 + cards.length * 90}%`, pin: true, scrub: 0.6, invalidateOnRefresh: true },
+        onUpdate: () => {
+          // which project is in the middle right now, for the 01 / 04 counter
+          const x = gsap.getProperty(track, "x") as number;
+          const k = cards.reduce((best, _, i) => (Math.abs(offset(i) - x) < Math.abs(offset(best) - x) ? i : best), 0);
+          if (count) count.textContent = String(k + 1).padStart(2, "0");
+        },
+      });
       // 1. walk up to the door: the whole garage front grows until the door fills the screen
       tl.fromTo(q(".garage-scene"), { scale: 0.5 }, { scale: 1, duration: 1, ease: "power2.inOut" }, 0)
         .to(q(".garage-note"), { opacity: 0, duration: 0.3 }, 0.1)
         // 2. the shutter rattles up (and back down, scrolling the other way)
         .call(rattle, [], 1.05)
         .to(q(".shutter"), { yPercent: -100, duration: 0.8, ease: "power2.inOut" }, 1.05)
-        // 3. the projects roll forward into the light
-        .from(q(".garage-card"), { y: 60, opacity: 0, rotate: 0, stagger: 0.12, duration: 0.5, ease: "power3.out" }, 1.55)
-        .to({}, { duration: 0.6 }); // a beat to look around before the page moves on
+        // 3. the first project rolls in from the right
+        .fromTo(track, { x: () => window.innerWidth * 0.6, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 1.5)
+        .from(q(".garage-count"), { opacity: 0, duration: 0.3 }, 1.7);
+      // 4. then the row slides left, stopping on each project in turn
+      for (let k = 1; k < cards.length; k++) {
+        tl.to({}, { duration: 0.35 }).to(track, { x: () => offset(k), duration: 0.8, ease: "power2.inOut" });
+      }
+      tl.to({}, { duration: 0.5 }); // a beat on the last one before the page moves on
     },
     { scope: root },
   );
@@ -60,7 +79,7 @@ export default function Garage() {
         </p>
 
         <div className="garage-door">
-          <div className="garage-inside" data-lenis-prevent>
+          <div className="garage-inside">
             <h2 className="sr-only">{garage.title}</h2>
             <ol className="garage-cards">
               {garage.items.map((p, i) => {
@@ -90,6 +109,9 @@ export default function Garage() {
                 );
               })}
             </ol>
+            <p className="garage-count" aria-hidden>
+              <span className="garage-count-now">01</span> / {String(garage.items.length).padStart(2, "0")}
+            </p>
           </div>
           <div className="shutter" aria-hidden>
             <span className="shutter-handle" />
