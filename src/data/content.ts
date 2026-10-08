@@ -22,16 +22,18 @@ export const cover = {
 
 export const rider = {
   kicker: "Nº 01 — The rider",
-  // one long editorial sentence; *starred* words are set in orange italics
+  // {key} = a sticker chip (defined below), *starred* = serif italics
   statement:
-    "I'm a frontend developer with *2.5+ years* on the road, shipping scalable, responsive products in React, Next.js and TypeScript, from reusable component systems to auth, role-based access and REST integrations. Off the clock, I'm out on my *Hunter 350*.",
-  stats: [
-    { v: "2.5+", k: "Years building" },
-    { v: "5+", k: "Production apps" },
-    { v: "30+", k: "Reusable components" },
-  ],
+    "I build {react} interfaces that load fast, look sharp and ride *smooth.* {years} of shipping with {next} and {ts} — and off the clock, I'm out on my\u00a0{hunter}",
+  chips: {
+    react: { label: "React", icon: "react", tilt: -4 },
+    years: { label: "2.5+ years", tone: "orange", tilt: 3 },
+    next: { label: "Next.js", icon: "next", tilt: -3 },
+    ts: { label: "TypeScript", icon: "ts", tilt: 4 },
+    hunter: { label: "Hunter 350", icon: "helmet", tone: "ink", tilt: -5 },
+  },
   note: "still loving every km",
-};
+}
 
 /** Skills, as a motorcycle spec sheet: each group is a part of the bike. */
 export const specs = {
