@@ -5,6 +5,7 @@ import { cover } from "@/data/content";
 import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 import { Bike } from "./Bike";
 import { Arrow } from "./Doodles";
+import { ENGINE, playEngineStart } from "@/lib/engineSound";
 
 /** Where the exhaust puffs come out, in the bike drawing's own units (the silencer tip, at the back). */
 const PUFFS = [
@@ -13,9 +14,31 @@ const PUFFS = [
   { x: 186, y: 416, r: 28 },
 ];
 
+/** One puff of exhaust left behind at the silencer tip, drifting back and up as it fades. */
+function puffAt(bike: HTMLElement, layer: HTMLElement, back = 0) {
+  if (layer.childElementCount > 40) return;
+  const b = bike.getBoundingClientRect();
+  const l = layer.getBoundingClientRect();
+  const size = b.width * gsap.utils.random(0.03, 0.055);
+  const d = document.createElement("span");
+  d.className = "smoke";
+  Object.assign(d.style, {
+    width: `${size}px`,
+    height: `${size}px`,
+    left: `${b.left - l.left - back + b.width * (PUFFS[0].x / 1000) - size / 2}px`,
+    top: `${b.top - l.top + b.height * (PUFFS[0].y / 560) - size / 2}px`,
+  });
+  layer.appendChild(d);
+  gsap.fromTo(
+    d,
+    { scale: 0.3, opacity: 0.9 },
+    { scale: gsap.utils.random(1.6, 2.6), opacity: 0, x: gsap.utils.random(-70, -20), y: gsap.utils.random(-50, -15), duration: gsap.utils.random(0.9, 1.4), ease: "power2.out", onComplete: () => d.remove() },
+  );
+}
+
 /**
  * The cover: one statement set big and loose, the bike underneath as the thing to play with. Click it and it
- * starts up: a shudder, spinning wheels, puffs from the exhaust. Scroll on and it rides off.
+ * starts up: a shudder, spinning wheels, puffs from the exhaust. Scroll on and the page holds while it rides off.
  */
 export default function Cover() {
   const root = useRef<HTMLElement>(null);
@@ -39,31 +62,66 @@ export default function Cover() {
         .fromTo(".cover-cue .arrow path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, stagger: 0.15 }, "-=0.2")
         .from(".cover-cue-text", { opacity: 0, rotate: -10, duration: 0.6, ease: "back.out(2)" }, "<");
 
-      // on the way down the bike rides off to the right, wheels turning
-      const ride = gsap.timeline({ scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 0.6 } });
-      ride.to(".cover-bike", { xPercent: 70, ease: "none" }, 0).to(".cover-cue", { opacity: 0, ease: "none" }, 0);
-      el.querySelectorAll<SVGGElement>(".bike-wheel").forEach((w) => ride.to(w, { rotation: 720, svgOrigin: w.dataset.origin, ease: "none" }, 0));
+      // on the way down the cover holds still while the bike rides right off the screen, smoke trailing behind
+      const bike = el.querySelector<HTMLElement>(".cover-bike")!;
+      const smoke = el.querySelector<HTMLElement>(".cover-smoke")!;
+      const restLeft = () => bike.getBoundingClientRect().left - (gsap.getProperty(bike, "x") as number);
+      let lastPuffX = 0;
+      const ride = gsap.timeline({
+        scrollTrigger: { trigger: el, start: "top top", end: "+=110%", pin: true, scrub: 0.6, invalidateOnRefresh: true },
+        onUpdate: () => {
+          const x = gsap.getProperty(bike, "x") as number;
+          if (x < lastPuffX) lastPuffX = x; // riding back up: no smoke, just keep the counter honest
+          if (x <= 2) return;
+          // one puff every ~34px of road; a fast scroll covers more in a frame, so fill in the gaps behind
+          const gap = Math.min(Math.floor((x - lastPuffX) / 34), 4);
+          for (let i = gap - 1; i >= 0; i--) puffAt(bike, smoke, i * 34);
+          if (gap > 0) lastPuffX = x;
+        },
+      });
+      ride
+        .to(bike, { x: () => window.innerWidth - restLeft() + 40, ease: "power1.in" }, 0)
+        .to(".cover-cue", { opacity: 0, duration: 0.12, ease: "none" }, 0);
+      el.querySelectorAll<SVGGElement>(".bike-wheel").forEach((w) => ride.to(w, { rotation: 1080, svgOrigin: w.dataset.origin, ease: "power1.in" }, 0));
     },
     { scope: root },
   );
 
-  /** Start the engine: shudder, wheels spin, three puffs of exhaust and a handwritten "vroom!". */
+  /** Start the engine: the sound, plus a shudder, spinning wheels, puffs of exhaust and a handwritten "vroom!". */
   const rev = () => {
-    if (revving.current || prefersReducedMotion() || !root.current) return;
+    if (revving.current || !root.current) return;
     revving.current = true;
+    // the sound first, while the browser still counts this as the click (it only allows audio then)
+    playEngineStart();
+    if (prefersReducedMotion()) {
+      window.setTimeout(() => void (revving.current = false), ENGINE.end * 1000);
+      return;
+    }
     const el = root.current;
     const q = gsap.utils.selector(el); // keep every selector inside the cover
+    const bike = q(".cover-bike .bike");
+    const shake = (from: number, to: number, px: number) =>
+      tl.to(bike, { x: `random(-${px}, ${px})`, y: `random(-${px * 0.6}, ${px * 0.6})`, rotate: `random(-${px * 0.12}, ${px * 0.12})`, duration: 0.045, repeat: Math.round((to - from) / 0.045), yoyo: true, ease: "none" }, from);
+    const puff = (p: Element, at: number, i: number) =>
+      tl.fromTo(p, { scale: 0.2, opacity: 0.9, x: 0, y: 0, transformOrigin: "50% 50%" }, { scale: 1.6, opacity: 0, x: -60 - i * 30, y: -20 - i * 8, duration: 0.9, ease: "power2.out" }, at);
     const tl = gsap.timeline({ onComplete: () => void (revving.current = false) });
-    tl.to(q(".cover-bike .bike"), { x: "random(-5, 5)", y: "random(-3, 3)", rotate: "random(-0.6, 0.6)", duration: 0.05, repeat: 13, yoyo: true, ease: "none" }, 0)
-      .set(q(".cover-bike .bike"), { x: 0, y: 0, rotate: 0 });
-    el.querySelectorAll<SVGGElement>(".bike-wheel").forEach((w) => tl.to(w, { rotation: "+=540", svgOrigin: w.dataset.origin, duration: 1.1, ease: "power2.inOut" }, 0.2));
-    el.querySelectorAll<SVGCircleElement>(".puff").forEach((p, i) => {
-      tl.fromTo(p, { scale: 0.2, opacity: 0.9, x: 0, transformOrigin: "50% 50%" }, { scale: 1.6, opacity: 0, x: -60 - i * 30, y: -20 - i * 8, duration: 1, ease: "power2.out" }, 0.1 + i * 0.12);
-    });
-    tl.fromTo(q(".cover-vroom"), { opacity: 0, y: 0, scale: 0.6, rotate: -12 }, { opacity: 1, scale: 1, rotate: -6, duration: 0.35, ease: "back.out(3)" }, 0.15).to(
+
+    // timed to the sound: crank → it catches → throttle blip → idle → off
+    shake(0, ENGINE.crankEnd, 1.5); // starter turning it over
+    shake(ENGINE.crankEnd, ENGINE.crankEnd + 0.3, 5); // it catches with a shudder
+    shake(ENGINE.revStart, ENGINE.idleFrom, 3.5); // the blip
+    shake(ENGINE.idleFrom, ENGINE.fadeFrom + 0.3, 1.2); // idling
+    tl.set(bike, { x: 0, y: 0, rotate: 0 }, ENGINE.end);
+    el.querySelectorAll<SVGGElement>(".bike-wheel").forEach((w) =>
+      tl.to(w, { rotation: "+=540", svgOrigin: w.dataset.origin, duration: ENGINE.idleFrom - ENGINE.revStart + 0.3, ease: "power2.inOut" }, ENGINE.revStart),
+    );
+    const puffs = el.querySelectorAll<SVGCircleElement>(".puff");
+    puffs.forEach((p, i) => puff(p, ENGINE.crankEnd + 0.05 + i * 0.1, i)); // first breaths as it catches
+    puffs.forEach((p, i) => puff(p, ENGINE.revStart + 0.05 + i * 0.12, i)); // and again on the blip
+    tl.fromTo(q(".cover-vroom"), { opacity: 0, y: 0, scale: 0.6, rotate: -12 }, { opacity: 1, scale: 1, rotate: -6, duration: 0.35, ease: "back.out(3)" }, ENGINE.revStart).to(
       q(".cover-vroom"),
       { opacity: 0, y: -16, duration: 0.5 },
-      1.1,
+      ENGINE.idleFrom + 0.2,
     );
   };
 
@@ -86,6 +144,7 @@ export default function Cover() {
         </span>
       </h1>
 
+      <div className="cover-smoke" aria-hidden />
       <div className="cover-stage">
         <button className="cover-bike" type="button" onClick={rev} aria-label="Start the engine">
           <Bike />

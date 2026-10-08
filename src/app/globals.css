@@ -308,6 +308,19 @@ body::after {
   stroke-width: 2;
   opacity: 0;
 }
+/* the exhaust trail left behind as the bike rides off */
+.cover-smoke {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.smoke {
+  position: absolute;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
 .cover-vroom {
   position: absolute;
   left: -2%;
