@@ -2,16 +2,16 @@
 
 import { useRef } from "react";
 import { garage } from "@/data/content";
-import { gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 import { playShutter } from "@/lib/shutterSound";
 import { Arrow } from "./Doodles";
 
-const SHUTTER_UP = 0.85; // seconds to roll a shutter all the way up
+/** Each project card rests at its own slight angle inside the garage. */
+const TILT = [-1.6, 1.2, 1.4, -1.1];
 
 /**
- * The work, as a row of garage doors with roller shutters. As the doors come into view the shutters rattle up
- * one after another to show the project parked inside; hovering, clicking or tabbing to a door opens it too.
- * Scroll back above them and they come down again.
+ * The work, behind one big garage door. The section holds still while the scroll zooms in on the door until
+ * it fills the screen; then the roller shutter rattles up and the projects are there inside, under the lamp.
  */
 export default function Garage() {
   const root = useRef<HTMLElement>(null);
@@ -23,95 +23,81 @@ export default function Garage() {
         gsap.set(q(".shutter"), { display: "none" });
         return;
       }
-      // the shop sign swings on its chains as it comes into view
-      gsap.from(q(".garage-sign"), { rotate: -9, transformOrigin: "50% -40px", duration: 1.8, ease: "elastic.out(1, 0.35)", scrollTrigger: { trigger: q(".garage-sign")[0], start: "top 85%" } });
-      gsap.fromTo(q(".garage-note .arrow path"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, stagger: 0.15, scrollTrigger: { trigger: q(".garage-note")[0], start: "top 85%" } });
+      let lastSound = 0;
+      const rattle = () => {
+        if (performance.now() - lastSound < 1000) return;
+        lastSound = performance.now();
+        playShutter(0.8);
+      };
 
-      const wide = window.matchMedia("(min-width: 1100px)").matches;
-      q(".bay").forEach((bay, i) => {
-        ScrollTrigger.create({
-          trigger: bay,
-          start: "top 70%",
-          onEnter: () => open(bay, wide ? i * 0.28 : 0),
-          onLeaveBack: () => close(bay),
-        });
-      });
+      const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=260%", pin: true, scrub: 0.6 } });
+      // 1. walk up to the door: the whole garage front grows until the door fills the screen
+      tl.fromTo(q(".garage-scene"), { scale: 0.5 }, { scale: 1, duration: 1, ease: "power2.inOut" }, 0)
+        .to(q(".garage-note"), { opacity: 0, duration: 0.3 }, 0.1)
+        // 2. the shutter rattles up (and back down, scrolling the other way)
+        .call(rattle, [], 1.05)
+        .to(q(".shutter"), { yPercent: -100, duration: 0.8, ease: "power2.inOut" }, 1.05)
+        // 3. the projects roll forward into the light
+        .from(q(".garage-card"), { y: 60, opacity: 0, rotate: 0, stagger: 0.12, duration: 0.5, ease: "power3.out" }, 1.55)
+        .to({}, { duration: 0.6 }); // a beat to look around before the page moves on
     },
     { scope: root },
   );
 
   return (
-    <section className="garage section" id="garage" ref={root} aria-label="Work">
-      <div className="garage-head">
-        <div className="garage-sign">
-          <span className="garage-sign-chain" aria-hidden />
-          <h2>{garage.title}</h2>
+    <section className="garage" id="garage" ref={root} aria-label="Work">
+      <div className="garage-scene">
+        {/* the building front around the door, with the shop sign hanging over it */}
+        <div className="garage-building" aria-hidden>
+          <div className="garage-sign">
+            <span className="garage-sign-chain" />
+            <span className="garage-sign-text">{garage.title}</span>
+          </div>
         </div>
         <p className="garage-note hand" aria-hidden>
           {garage.note}
           <Arrow />
         </p>
-      </div>
 
-      <ol className="garage-row">
-        {garage.items.map((p, i) => {
-          const no = String(i + 1).padStart(2, "0");
-          const inner = (
-            <>
-              <span className="bay-no">Bay {no}</span>
-              <h3 className="bay-name">{p.name}</h3>
-              <p className="bay-tag">{p.tag}</p>
-              <p className="bay-blurb">{p.blurb}</p>
-              <span className="bay-go">{p.href ? "Visit the site ↗" : "Private build"}</span>
-            </>
-          );
-          return (
-            <li key={p.name} className="bay" onMouseEnter={(e) => open(e.currentTarget)} onFocus={(e) => open(e.currentTarget)}>
-              <span className="plate bay-plate" aria-hidden>
-                KA · 01 · PH · {no}
-              </span>
-              <div className="bay-door">
-                {p.href ? (
-                  <a className="bay-inside" href={p.href} target="_blank" rel="noreferrer">
-                    {inner}
-                  </a>
-                ) : (
-                  <div className="bay-inside is-private">{inner}</div>
-                )}
-                <div className="shutter" aria-hidden onClick={(e) => open(e.currentTarget.closest(".bay")!)}>
-                  <span className="shutter-handle" />
-                </div>
-                <span className="shutter-drum" aria-hidden />
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+        <div className="garage-door">
+          <div className="garage-inside" data-lenis-prevent>
+            <h2 className="sr-only">{garage.title}</h2>
+            <ol className="garage-cards">
+              {garage.items.map((p, i) => {
+                const no = String(i + 1).padStart(2, "0");
+                const inner = (
+                  <>
+                    <span className="garage-card-top">
+                      <span>Bay {no}</span>
+                      <span className="plate">KA · 01 · PH · {no}</span>
+                    </span>
+                    <h3 className="garage-name">{p.name}</h3>
+                    <p className="garage-tag">{p.tag}</p>
+                    <p className="garage-blurb">{p.blurb}</p>
+                    <span className="garage-go">{p.href ? "Visit the site ↗" : "Private build"}</span>
+                  </>
+                );
+                return (
+                  <li key={p.name} className="garage-card" style={{ ["--tilt" as string]: `${TILT[i % TILT.length]}deg` }}>
+                    {p.href ? (
+                      <a className="garage-card-in" href={p.href} target="_blank" rel="noreferrer">
+                        {inner}
+                      </a>
+                    ) : (
+                      <div className="garage-card-in is-private">{inner}</div>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+          <div className="shutter" aria-hidden>
+            <span className="shutter-handle" />
+          </div>
+          <span className="shutter-drum" aria-hidden />
+        </div>
+        <span className="garage-floor" aria-hidden />
+      </div>
     </section>
   );
-}
-
-/** Roll a bay's shutter up (once it's up, it stays up until the bays are scrolled back past). */
-function open(bay: Element, delay = 0) {
-  if (bay.classList.contains("is-open") || prefersReducedMotion()) return;
-  bay.classList.add("is-open");
-  const shutter = bay.querySelector(".shutter");
-  gsap.killTweensOf(shutter);
-  gsap.to(shutter, {
-    yPercent: -100,
-    duration: SHUTTER_UP,
-    delay,
-    ease: "power2.inOut",
-    onStart: () => playShutter(SHUTTER_UP),
-  });
-  // a little jolt as it hits the top
-  gsap.fromTo(bay.querySelector(".bay-door"), { y: 0 }, { keyframes: { y: [0, -3, 1, 0] }, duration: 0.25, delay: delay + SHUTTER_UP, ease: "none" });
-}
-
-function close(bay: Element) {
-  if (!bay.classList.contains("is-open")) return;
-  bay.classList.remove("is-open");
-  const shutter = bay.querySelector(".shutter");
-  gsap.killTweensOf(shutter);
-  gsap.to(shutter, { yPercent: 0, duration: 0.6, ease: "power2.in" });
 }
