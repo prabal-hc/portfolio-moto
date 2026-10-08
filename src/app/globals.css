@@ -454,6 +454,23 @@ body::after {
 .rider-bike .bike-road {
   display: none;
 }
+/* crash damage: hidden until the hit */
+.bike-damage,
+.bike-sparks,
+.bike-wisp {
+  opacity: 0;
+}
+.bike-sparks {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.bike-wisp {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+}
 .rider-boom {
   position: absolute;
   left: 40%;

@@ -65,11 +65,14 @@ export function Bike({
   className = "",
   title = "Royal Enfield Hunter 350, line drawing",
   inlineStyles = false,
+  damage = false,
 }: {
   className?: string;
   title?: string;
   /** paint with inline attributes instead of CSS classes (for the link-preview card) */
   inlineStyles?: boolean;
+  /** include the (hidden) crash damage, for the rider section to reveal */
+  damage?: boolean;
 }) {
   const paint = inlineStyles ? inline : byClass;
   return (
@@ -86,7 +89,7 @@ export function Bike({
 
       {/* fenders */}
       <path d="M98 372 C120 290 200 262 278 272 C320 278 352 300 360 322" pathLength={1} {...paint("ink")} />
-      <path d="M672 338 C700 290 760 272 816 282 C846 288 870 306 880 330" pathLength={1} {...paint("ink")} />
+      <path d="M672 338 C700 290 760 272 816 282 C846 288 870 306 880 330" pathLength={1} {...paint("ink bike-fender")} />
 
       {/* swingarm + chain */}
       <path d="M232 404 L438 382 M232 418 L440 398" pathLength={1} {...paint("ink")} />
@@ -140,19 +143,34 @@ export function Bike({
       <path d="M690 206 L732 196" pathLength={1} {...paint("ink")} />
 
       {/* headlamp */}
-      <circle cx={752} cy={198} r={34} pathLength={1} {...paint("ink fill-paper")} />
-      <circle cx={752} cy={198} r={22} pathLength={1} {...paint("ink thin lamp")} />
-      <path d="M724 216 L708 230" pathLength={1} {...paint("ink thin")} />
+      <g className="bike-lamp">
+        <circle cx={752} cy={198} r={34} pathLength={1} {...paint("ink fill-paper")} />
+        <circle cx={752} cy={198} r={22} pathLength={1} {...paint("ink thin lamp")} />
+        <path d="M724 216 L708 230" pathLength={1} {...paint("ink thin")} />
+      </g>
 
       {/* handlebar, grip, mirror and the round console */}
       <path d="M712 190 C696 168 680 156 650 152 L630 152" pathLength={1} {...paint("ink")} />
       <path d="M626 146 h-30 a6 6 0 0 0 0 12 h30" pathLength={1} {...paint("ink")} />
-      <path d="M676 158 L664 106" pathLength={1} {...paint("ink thin")} />
-      <circle cx={662} cy={92} r={14} pathLength={1} {...paint("ink thin")} />
+      <g className="bike-mirror">
+        <path d="M676 158 L664 106" pathLength={1} {...paint("ink thin")} />
+        <circle cx={662} cy={92} r={14} pathLength={1} {...paint("ink thin")} />
+      </g>
       <circle cx={716} cy={176} r={10} pathLength={1} {...paint("ink thin")} />
 
       {/* footpeg */}
       <path d="M448 438 h40" pathLength={1} {...paint("ink thin")} />
+
+      {/* after a crash: cracks and a dent in the tank, sparks off the front, smoke from the engine (hidden until then) */}
+      {damage && (
+        <g className="bike-damage">
+          <path d="M552 196 l16 18 l-9 13 l18 15 M618 190 l-7 19 l13 11 M586 230 C598 240 614 240 626 232" pathLength={1} {...paint("ink")} />
+          <path className="bike-sparks" d="M908 262 l24 -20 M918 304 l32 0 M908 346 l24 20 M884 240 l6 -28" />
+          {[0, 1, 2, 3].map((i) => (
+            <circle key={i} className="bike-wisp" cx={626} cy={228} r={12 + i * 3} />
+          ))}
+        </g>
+      )}
     </svg>
   );
 }

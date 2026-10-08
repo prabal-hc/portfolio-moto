@@ -126,17 +126,39 @@ export default function Rider() {
 
       // 1. ride in from off-screen left, wheels turning
       tl.fromTo(bike, { x: () => -bike.offsetLeft - bw() - 40 }, { x: impactX, duration: 1, ease: "power1.in" }, 0);
-      el.querySelectorAll<SVGGElement>(".rider-bike .bike-wheel").forEach((w) => tl.to(w, { rotation: 900, svgOrigin: w.dataset.origin, duration: 1.15, ease: "power1.in" }, 0));
+      const wheels = el.querySelectorAll<SVGGElement>(".rider-bike .bike-wheel");
+      wheels.forEach((w) => tl.to(w, { rotation: 900, svgOrigin: w.dataset.origin, duration: 1, ease: "power1.in" }, 0));
 
       // 2. impact (with sound, only when riding forward into it): the scene shakes, the bike bucks up off its front wheel and bounces back, "crash!"
       tl.call(() => void (tl.scrollTrigger?.direction === 1 && playCrash()), [], 1);
       tl.to(q(".rider-scene"), { keyframes: { x: [0, -16, 13, -9, 5, 0] }, duration: 0.3, ease: "none" }, 1)
         .to(bike, { x: () => impactX() - bw() * 0.14, rotation: 9, transformOrigin: "89% 96%", duration: 0.22, ease: "power2.out" }, 1)
         .to(bike, { rotation: 0, duration: 0.25, ease: "bounce.out" }, 1.22)
-        .to(bike, { opacity: 0, duration: 0.35 }, 1.7)
         .fromTo(q(".rider-boom"), { opacity: 0, scale: 0.4, rotate: -20 }, { opacity: 1, scale: 1, rotate: -8, duration: 0.18, ease: "back.out(3)" }, 1)
-        .to(q(".rider-boom"), { opacity: 0, y: -30, duration: 0.3 }, 1.55)
-        .to(q(".rider-road"), { scaleX: 0, transformOrigin: "right", duration: 0.5, ease: "power2.in" }, 1.6);
+        .to(q(".rider-boom"), { opacity: 0, y: -30, duration: 0.3 }, 1.55);
+
+      // 2b. and the bike is wrecked (it stays on the road like that). Moves here are in the bike drawing's units.
+      tl.set(q(".bike-damage"), { opacity: 1 }, 1)
+        // sparks off the front
+        .fromTo(q(".bike-sparks"), { opacity: 0, scale: 0.5, svgOrigin: "900 300" }, { opacity: 1, scale: 1.3, duration: 0.1 }, 1)
+        .to(q(".bike-sparks"), { opacity: 0, duration: 0.2 }, 1.12)
+        // the front wheel buckles and the mudguard gets knocked crooked
+        .to(wheels[1], { scaleX: 0.8, scaleY: 1.04, svgOrigin: wheels[1].dataset.origin, duration: 0.15, ease: "power3.out" }, 1)
+        .to(q(".bike-fender"), { rotation: 24, svgOrigin: "672 338", duration: 0.18, ease: "back.out(3)" }, 1)
+        // the headlamp snaps off, flies forward, drops, bounces and rolls away along the road
+        .to(q(".bike-lamp"), { x: 150, rotation: 300, svgOrigin: "752 198", duration: 0.6, ease: "power1.out" }, 1.02)
+        .to(q(".bike-lamp"), { y: -90, duration: 0.2, ease: "power2.out" }, 1.02)
+        .to(q(".bike-lamp"), { y: 308, duration: 0.34, ease: "power2.in" }, 1.22)
+        .to(q(".bike-lamp"), { keyframes: { y: [308, 282, 308] }, duration: 0.16, ease: "none" }, 1.56)
+        .to(q(".bike-lamp"), { x: 230, rotation: 420, duration: 0.4, ease: "power2.out" }, 1.62)
+        // the mirror snaps at its stalk and drops behind
+        .to(q(".bike-mirror"), { rotation: 75, svgOrigin: "676 158", duration: 0.1, ease: "power2.out" }, 1)
+        .to(q(".bike-mirror"), { x: -50, y: 312, rotation: 230, duration: 0.4, ease: "power2.in" }, 1.12)
+        // and smoke keeps curling up out of the engine
+        .set(q(".bike-wisp"), { transformOrigin: "50% 50%" }, 1);
+      q(".bike-wisp").forEach((w, i) =>
+        tl.to(w, { keyframes: { opacity: [0, 0.8, 0], y: [0, -70, -140], x: [0, -12, -34], scale: [0.5, 1.2, 1.9] }, duration: 0.7, repeat: 2, ease: "none" }, 1.25 + i * 0.17),
+      );
 
       // 3. the stones fly: up and away in arcs, the ones nearest the bike first, tumbling as they go
       const unit = () => wall.getBoundingClientRect().width / WALL.w || 1; // px per wall unit (stones move in SVG units)
@@ -175,7 +197,7 @@ export default function Rider() {
         <Wall />
         <div className="rider-smoke" />
         <div className="rider-bike">
-          <Bike title="" />
+          <Bike title="" damage />
         </div>
         <span className="rider-boom hand">{rider.boom}</span>
       </div>
