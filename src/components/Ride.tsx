@@ -237,9 +237,6 @@ export default function Ride() {
                 PH
               </span>
               <div className="pump-head">
-                <span className="pump-brand" aria-hidden>
-                  {ride.pump}
-                </span>
                 <a className="pump-display" href={`mailto:${profile.email}`} aria-label={`Email ${profile.email}`}>
                   <span className="pump-display-label" aria-hidden>
                     {copied ? "copied ✓" : "e-mail"}

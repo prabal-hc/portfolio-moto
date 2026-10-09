@@ -118,7 +118,6 @@ export const route = {
 
 export const ride = {
   title: ["Out of fuel?", "Let's talk."],
-  pump: "Holla Fuels · since 2022",
   neon: "open to work",
   nozzle: "click the pump to fill up (and grab my email)",
   body: "Open to new frontend roles and interesting projects. Tell me what you're building.",

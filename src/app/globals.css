@@ -1447,18 +1447,9 @@ a.car-go:focus-visible {
   border: 3px solid var(--paper);
   border-radius: 22px 22px 6px 6px;
 }
-.pump-brand {
-  display: block;
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
 .pump-display {
   display: block;
-  margin-top: 12px;
+  margin-top: 0;
   padding: 10px 10px 12px;
   background: #0e0d0c;
   border: 3px solid var(--paper);
@@ -1497,6 +1488,7 @@ a.car-go:focus-visible {
 .pump-btn {
   flex: 1;
   padding: 10px 6px;
+  white-space: nowrap;
   text-align: center;
   font-family: var(--mono);
   font-size: 11px;
