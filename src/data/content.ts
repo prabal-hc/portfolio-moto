@@ -57,11 +57,11 @@ export const garage = {
   note: "things I've put miles on",
   items: [
     {
-      name: "Hyundai IONIQ 9 Configurator",
-      tag: "React · Three.js · 4Syte",
-      blurb: "Real-time 3D vehicle configurator with live trim customization and 360° viewing.",
-      href: "https://hyundai-3dconfigurator.com/",
-      cover: "/projects/hyundai.jpg",
+      name: "Indians in Korea",
+      tag: "Next.js · Supabase · GSAP",
+      blurb: "Community platform for Indians across South Korea: events, news, resources and memberships, with a Supabase-backed admin for every section.",
+      href: "https://indiansinkorea.netlify.app/",
+      cover: "/projects/indians-in-korea.jpg",
     },
     {
       name: "Western Aroma",
