@@ -50,30 +50,30 @@ export default function Ride() {
     const k = parseFloat(getComputedStyle(art).width) / 90; // px per nozzle-drawing unit
     const t = reach.current.t;
 
-    // on the hook: hanging off the pump's side, handle against the pump, spout out
-    const hook = { x: pump.right - s.left + (TIP.x - HANDLE.x) * k + 4, y: pump.top - s.top + pump.height * 0.64 };
+    // on the hook: hanging off the pump's left side (the bike side), handle against the pump, spout out towards the bike
+    const hook = { x: pump.left - s.left - (TIP.x - HANDLE.x) * k - 4, y: pump.top - s.top + pump.height * 0.64 };
     // in the tank: spout tip on the filler cap
     const tank = { x: bike.left - s.left + (bike.width * FILLER.x) / 1000, y: bike.top - s.top + (bike.height * FILLER.y) / 560 - 2 };
     // flown along an arc, lifted over the gap
     const lift = { x: (hook.x + tank.x) / 2, y: Math.min(hook.y, tank.y) - Math.abs(hook.x - tank.x) * 0.35 };
     const u = 1 - t;
     const tip = { x: u * u * hook.x + 2 * u * t * lift.x + t * t * tank.x, y: u * u * hook.y + 2 * u * t * lift.y + t * t * tank.y };
-    // it turns over on the way (mirrored, so the spout faces the bike) and tips down to pour
+    // mirrored so the spout faces the bike; it tips down to pour on the way over
     const smooth = (a: number, b: number) => gsap.utils.clamp(0, 1, (t - a) / (b - a)) ** 2 * (3 - 2 * gsap.utils.clamp(0, 1, (t - a) / (b - a)));
-    const flip = 1 - 2 * smooth(0.2, 0.6);
+    const flip = -1;
     const angle = POUR_ANGLE * smooth(0.35, 1);
     nozzle.style.transform = `translate(${tip.x}px, ${tip.y}px) rotate(${angle}deg) scaleX(${flip})`;
 
-    // the hose: from the pump's side to the back of the handle, sagging under its own weight
+    // the hose: out of the pump's left side to the back of the handle, sagging under its own weight
     const rad = (angle * Math.PI) / 180;
     const vx = (HANDLE.x - TIP.x) * k * flip;
     const vy = (HANDLE.y - TIP.y) * k;
     const end = { x: tip.x + vx * Math.cos(rad) - vy * Math.sin(rad), y: tip.y + vx * Math.sin(rad) + vy * Math.cos(rad) };
-    const start = { x: pump.right - s.left - 3, y: pump.top - s.top + pump.height * 0.42 };
+    const start = { x: pump.left - s.left + 3, y: pump.top - s.top + pump.height * 0.42 };
     const sag = Math.max(40, Math.hypot(end.x - start.x, end.y - start.y) * 0.45);
     hose.setAttribute(
       "d",
-      `M${start.x} ${start.y} C${start.x + sag * 0.6} ${start.y + sag * 0.2} ${end.x + (end.x < start.x ? -1 : 1) * sag * 0.2} ${Math.max(start.y, end.y) + sag} ${end.x} ${end.y}`,
+      `M${start.x} ${start.y} C${start.x - sag * 0.6} ${start.y + sag * 0.2} ${end.x + (end.x < start.x ? 1 : -1) * sag * 0.2} ${Math.max(start.y, end.y) + sag} ${end.x} ${end.y}`,
     );
   };
 

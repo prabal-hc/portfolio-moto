@@ -1392,9 +1392,9 @@ a.car-go:focus-visible {
 /* the bike, redrawn in chalk for the dark */
 .station-bike {
   position: absolute;
-  left: 6%;
+  left: 1%;
   bottom: calc(var(--ground) - 0.6%);
-  width: 42%;
+  width: 40%;
 }
 .bike-beam {
   position: absolute;
@@ -1775,10 +1775,10 @@ a.car-go:focus-visible {
   }
   .station-bike {
     left: 0;
-    width: 52%;
+    width: 44%;
   }
   .pump {
-    left: 43%;
+    left: 54%;
     width: 42%;
   }
   .pump-globe {
@@ -1810,7 +1810,8 @@ a.car-go:focus-visible {
   .pump-toast {
     left: auto;
     right: 0;
-    top: -12%;
+    top: auto;
+    bottom: -9%;
     white-space: nowrap;
   }
   .pump-nozzle svg {
