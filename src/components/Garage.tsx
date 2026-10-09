@@ -130,7 +130,7 @@ export default function Garage() {
                       {"cover" in p && p.cover ? (
                         // the project's own hero, as its cover
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img className="car-cover" src={p.cover} alt="" loading="lazy" />
+                        <img className="car-cover" src={p.cover} alt={`${p.name} home page`} />
                       ) : (
                         <>
                           <span className="car-shape" />

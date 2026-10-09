@@ -61,14 +61,14 @@ export const garage = {
       tag: "Next.js · Supabase · GSAP",
       blurb: "Community platform for Indians across South Korea: events, news, resources and memberships, with a Supabase-backed admin for every section.",
       href: "https://indiansinkorea.netlify.app/",
-      cover: "/projects/indians-in-korea.jpg",
+      cover: "/projects/iik-hero.jpg",
     },
     {
       name: "Western Aroma",
       tag: "Next.js · React · TypeScript",
       blurb: "Estate-to-cup coffee and spice brand site: product catalogue, storytelling sections and checkout.",
       href: "https://westernaroma.netlify.app/",
-      cover: "/projects/western-aroma.jpg",
+      cover: "/projects/western-aroma-hero.jpg",
     },
     {
       name: "MediTrack",
