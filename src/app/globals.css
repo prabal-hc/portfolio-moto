@@ -1524,33 +1524,44 @@ a.car-go:focus-visible {
   border-top: 0;
   background-image: repeating-linear-gradient(to bottom, transparent 0 22px, rgba(28, 26, 23, 0.25) 22px 24px);
 }
-.pump-hose {
-  position: absolute;
-  left: 100%;
-  top: 34%;
-  width: 34%;
-  height: auto;
-  overflow: visible;
+.pump {
+  cursor: pointer;
 }
-.pump-hose path {
+/* the hose and nozzle sit over the whole scene so they can reach the bike; JS places them */
+.hose-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+}
+.hose {
+  fill: none;
   stroke: var(--paper);
-  stroke-width: 7;
+  stroke-width: max(4px, 0.75cqw);
   stroke-linecap: round;
 }
+/* a zero-size anchor at the spout tip: the drawing hangs off it, so it turns about the tip */
 .pump-nozzle {
   position: absolute;
-  left: calc(100% + 2px);
-  top: 66%;
-  width: 26%;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 0;
+  height: 0;
   padding: 0;
   background: none;
   border: 0;
   cursor: pointer;
-  transform-origin: 20% 30%;
 }
 .pump-nozzle svg {
-  display: block;
-  width: 100%;
+  position: absolute;
+  left: -6.833cqw;
+  top: -1.083cqw;
+  width: 7.5cqw;
+  height: 5.833cqw;
   overflow: visible;
 }
 .pump-nozzle path {
@@ -1563,8 +1574,65 @@ a.car-go:focus-visible {
   fill: none;
 }
 .pump-nozzle:hover path:first-child,
-.pump-nozzle:focus-visible path:first-child {
+.pump-nozzle:focus-visible path:first-child,
+.pump:hover ~ .pump-nozzle path:first-child {
   fill: var(--orange);
+}
+.station-smoke {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.station-smoke .smoke {
+  border-color: rgba(241, 233, 220, 0.8);
+}
+/* the fuel gauge that pops up over the tank while filling */
+.fuel-gauge {
+  position: absolute;
+  left: 40%;
+  bottom: 84%;
+  display: flex;
+  align-items: center;
+  gap: 0.7cqw;
+  padding: 0.5cqw 1cqw;
+  border: 2px solid var(--paper);
+  border-radius: 999px;
+  background: #121110;
+  font-family: var(--mono);
+  font-size: max(9px, 1.05cqw);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+}
+.fuel-track {
+  width: 9cqw;
+  height: max(7px, 0.9cqw);
+  border: 1.5px solid var(--paper);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.fuel-fill {
+  display: block;
+  height: 100%;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.fuel-full {
+  position: absolute;
+  left: 100%;
+  top: -70%;
+  margin-left: 0.6cqw;
+  font-size: max(18px, 2.4cqw);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--orange);
+  opacity: 0;
+  visibility: hidden;
+  transform: rotate(-8deg);
 }
 .pump-toast {
   position: absolute;
@@ -1738,6 +1806,18 @@ a.car-go:focus-visible {
   }
   .pump-hint {
     display: none;
+  }
+  .pump-toast {
+    left: auto;
+    right: 0;
+    top: -12%;
+    white-space: nowrap;
+  }
+  .pump-nozzle svg {
+    left: -10.02cqw;
+    top: -1.59cqw;
+    width: 11cqw;
+    height: 8.56cqw;
   }
   .pump-display-value {
     white-space: normal;
