@@ -760,110 +760,332 @@ body::after {
 .garage-inside {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(232, 80, 28, 0.3), transparent 70%),
-    var(--ink);
-}
-/* one row of projects; the first starts in the middle and the row slides left past the others */
-.garage-cards {
-  --card-w: min(62vw, 760px);
-  display: flex;
-  align-items: center;
-  gap: clamp(28px, 5vw, 90px);
-  padding-left: calc(50% - var(--card-w) / 2);
-  list-style: none;
-}
-.garage-card {
-  flex: 0 0 var(--card-w);
-  transform: rotate(var(--tilt));
-}
-.garage-count {
-  position: absolute;
-  left: 50%;
-  bottom: 26px;
-  transform: translateX(-50%);
-  font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.2em;
-  color: rgba(241, 233, 220, 0.6);
-}
-.garage-count-now {
-  color: var(--orange);
-}
-.garage-card-in {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: clamp(16px, 1.8vw, 28px);
-  background: var(--paper-2);
-  border: 1.5px solid var(--ink);
-  box-shadow: 0 0 0 var(--orange);
-  transition:
-    transform 0.5s var(--ease),
-    box-shadow 0.5s var(--ease);
-}
-a.garage-card-in:hover,
-a.garage-card-in:focus-visible {
-  transform: rotate(calc(var(--tilt) * -1)) translateY(-6px);
-  box-shadow: 8px 8px 0 var(--orange);
-}
-.garage-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  background: #121110;
 }
 .plate {
+  font-family: var(--mono);
+  font-size: 11px;
   border: 1.5px solid var(--ink);
   border-radius: 4px;
   padding: 3px 8px;
   background: #fffaf0;
+  color: var(--ink);
   letter-spacing: 0.1em;
+  white-space: nowrap;
 }
-.garage-name {
-  margin-top: clamp(18px, 2.2vw, 40px);
-  font-family: var(--display);
-  font-weight: 800;
-  font-size: clamp(26px, 3.4vw, 54px);
-  letter-spacing: -0.03em;
-  line-height: 0.96;
-  text-transform: uppercase;
+
+/* ---- the showroom: a car-select screen ---- */
+.showroom {
+  --ride-w: min(40vw, 520px);
+  --floor: 62%; /* where the cars stand */
 }
-.garage-tag {
-  margin-top: 10px;
+/* the cone of light from the lamp down to the floor */
+.spot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: calc(var(--ride-w) * 2.1);
+  height: calc(var(--floor) + 9%);
+  transform: translateX(-50%);
+  clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+  background: linear-gradient(to bottom, rgba(255, 238, 210, 0.42), rgba(255, 238, 210, 0.12) 70%, rgba(255, 238, 210, 0.04));
+  pointer-events: none;
+}
+.lamp {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 70px;
+  height: 34px;
+  margin-left: -35px;
+  background: var(--paper-3);
+  border: 3px solid #050505;
+  border-top: 0;
+  clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+}
+.lamp-bulb {
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 26px;
+  height: 14px;
+  margin-left: -13px;
+  border-radius: 0 0 26px 26px;
+  background: #fff4dc;
+  box-shadow: 0 0 30px 12px rgba(255, 236, 200, 0.55);
+}
+/* the warm pool of light on the floor */
+.spot-pool {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--floor) - 6%);
+  width: calc(var(--ride-w) * 2.2);
+  height: 26%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 50% 50% at 50% 45%, rgba(255, 232, 196, 0.28), rgba(232, 80, 28, 0.08) 60%, transparent 72%);
+  pointer-events: none;
+}
+.turntable {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--floor) - 3.5%);
+  width: calc(var(--ride-w) * 1.35);
+  height: 12%;
+  transform: translateX(-50%);
+  overflow: visible;
+}
+.turntable-base {
+  fill: rgba(255, 240, 215, 0.06);
+  stroke: rgba(241, 233, 220, 0.55);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.turntable-ring {
+  fill: none;
+  stroke: rgba(241, 233, 220, 0.4);
+  stroke-width: 2;
+  stroke-dasharray: 14 18;
+  vector-effect: non-scaling-stroke;
+}
+/* the row of cars: the one in the middle stands on the turntable */
+.cars {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--floor);
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--ride-w) * 0.32);
+  padding-left: calc(50% - var(--ride-w) / 2);
+  list-style: none;
+}
+.car {
+  position: relative;
+  flex: 0 0 var(--ride-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 100%;
+}
+/* each project as a "vehicle": a hand-drawn browser window */
+.car-body {
+  width: 100%;
+  background: var(--paper-2);
+  border: 4px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 0 0 0 3px rgba(241, 233, 220, 0.85), 0 30px 50px -20px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+.car-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-bottom: 3px solid var(--ink);
+  background: var(--paper-3);
+}
+.car-bar i {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+.car-bar i:first-child {
+  background: var(--orange);
+}
+.car-url {
+  margin-left: 10px;
+  padding: 2px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper-2);
   font-family: var(--mono);
   font-size: 11px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.car-screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: flex-end;
+  padding: 6% 7%;
+  overflow: hidden;
+}
+.car-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.car-name {
+  position: relative;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: calc(var(--ride-w) * 0.068);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.car-shape {
+  position: absolute;
+  background: var(--orange);
+  border: 3px solid var(--ink);
+}
+.shape-sun .car-shape {
+  right: 8%;
+  top: 12%;
+  width: 34%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.shape-stripe .car-shape {
+  left: -10%;
+  right: -10%;
+  top: 22%;
+  height: 22%;
+  transform: rotate(-8deg);
+}
+.shape-arch .car-shape {
+  right: 10%;
+  bottom: -30%;
+  width: 40%;
+  aspect-ratio: 1 / 1.3;
+  border-radius: 999px 999px 0 0;
+}
+.shape-dot .car-shape {
+  right: 12%;
+  top: 14%;
+  width: 18%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: -60px 40px 0 -6px var(--orange), -60px 40px 0 -3px var(--ink);
+}
+.car-plate {
+  margin-top: -2px;
+  transform: translateY(-50%);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+}
+/* the details of the ride in the light */
+.car-infos {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--floor) + 9%);
+  bottom: 5%;
+  width: min(760px, 88%);
+  transform: translateX(-50%);
+}
+.car-info {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--paper);
+}
+.car-info-no {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(241, 233, 220, 0.5);
+}
+.car-info-name {
+  margin-top: 6px;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(22px, 2.6vw, 40px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+.car-info-tag {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--orange);
 }
-.garage-blurb {
-  flex: 1;
-  margin-top: 10px;
+.car-info-blurb {
+  margin-top: 8px;
+  max-width: 600px;
   font-family: var(--serif);
-  font-size: clamp(16px, 1.5vw, 22px);
+  font-size: clamp(15px, 1.25vw, 19px);
   line-height: 1.4;
-  color: var(--ink-2);
+  color: rgba(241, 233, 220, 0.78);
 }
-.garage-go {
-  margin-top: 16px;
+/* a game-menu button, leaning forward */
+.car-go {
+  margin-top: 14px;
+  padding: 10px 26px;
   font-family: var(--mono);
   font-size: 12px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--ink);
+  background: var(--orange);
+  border: 2px solid var(--paper);
+  transform: skewX(-12deg);
+  box-shadow: 4px 4px 0 var(--paper);
+  transition:
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
 }
-a.garage-card-in:hover .garage-go {
+a.car-go:hover,
+a.car-go:focus-visible {
+  transform: skewX(-12deg) translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--paper);
+}
+.car-go.is-private {
+  background: transparent;
+  color: rgba(241, 233, 220, 0.5);
+  border-color: rgba(241, 233, 220, 0.3);
+  box-shadow: none;
+}
+/* game chrome: title, counter, hint */
+.showroom-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(241, 233, 220, 0.6);
+}
+.showroom-title {
+  position: absolute;
+  left: clamp(16px, 2.6vw, 40px);
+  top: 42px;
+  padding-left: 12px;
+  border-left: 3px solid var(--orange);
+  color: var(--paper);
+}
+.showroom-count {
+  position: absolute;
+  right: clamp(16px, 2.6vw, 40px);
+  top: 42px;
+}
+.showroom-count-now {
   color: var(--orange);
+  font-size: 22px;
+  letter-spacing: 0.05em;
 }
-.is-private .garage-go {
-  color: var(--muted);
+.showroom-hint {
+  position: absolute;
+  right: clamp(16px, 2.6vw, 40px);
+  bottom: 22px;
 }
+
 /* the roller shutter: slats, a heavy bottom rail and a handle; it rolls up into the drum */
 .shutter {
   display: none;
@@ -1204,9 +1426,18 @@ a.garage-card-in:hover .garage-go {
     width: 48px;
     transform: rotate(-110deg) translateY(6px);
   }
-  .garage-cards {
-    --card-w: 80vw;
-    gap: 20px;
+  .showroom {
+    --ride-w: 66vw;
+    --floor: 46%;
+  }
+  .car-bar {
+    padding: 6px 8px;
+  }
+  .car-url {
+    font-size: 9px;
+  }
+  .showroom-hint {
+    display: none;
   }
   .garage-note {
     display: none;

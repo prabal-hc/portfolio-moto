@@ -61,12 +61,14 @@ export const garage = {
       tag: "React · Three.js · 4Syte",
       blurb: "Real-time 3D vehicle configurator with live trim customization and 360° viewing.",
       href: "https://hyundai-3dconfigurator.com/",
+      cover: "/projects/hyundai.jpg",
     },
     {
       name: "Western Aroma",
       tag: "Next.js · React · TypeScript",
       blurb: "Estate-to-cup coffee and spice brand site: product catalogue, storytelling sections and checkout.",
       href: "https://westernaroma.netlify.app/",
+      cover: "/projects/western-aroma.jpg",
     },
     {
       name: "MediTrack",
