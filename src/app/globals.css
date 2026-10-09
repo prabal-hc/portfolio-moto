@@ -333,47 +333,6 @@ body::after {
   transform: rotate(-4deg);
 }
 
-/* ---------- marquee ---------- */
-.marquee {
-  display: flex;
-  overflow: hidden;
-  background: var(--ink);
-  color: var(--paper);
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
-  padding: clamp(10px, 1.4vw, 20px) 0;
-  white-space: nowrap;
-}
-.marquee-track {
-  flex: none;
-  display: flex;
-  will-change: transform;
-}
-.marquee-item {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--display);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  font-size: clamp(30px, 4.2vw, 72px);
-  line-height: 1;
-  text-transform: uppercase;
-  padding-left: 0.45em;
-}
-.marquee-star {
-  color: var(--orange);
-  font-size: 0.42em;
-  margin-left: 0.9em;
-}
-.marquee-orange {
-  background: var(--orange);
-  color: var(--ink);
-  border-color: var(--orange);
-}
-.marquee-orange .marquee-star {
-  color: var(--ink);
-}
-
 /* ---------- the rider: one centred statement with sticker chips ---------- */
 .rider {
   --bw: min(30vw, 400px, 46vh); /* the bike's width */

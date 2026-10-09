@@ -6,7 +6,6 @@ import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 import { playGlug } from "@/lib/glug";
 import { Bike } from "./Bike";
 import { Arrow } from "./Doodles";
-import Marquee from "./Marquee";
 
 const DIGITS = "0123456789";
 
@@ -66,7 +65,6 @@ export default function Ride() {
 
   return (
     <section className="ride" id="ride" ref={root} aria-label="Contact">
-      <Marquee items={ride.marquee} tone="orange" />
       <div className="ride-inner">
         <div className="station">
           <div className="station-copy">

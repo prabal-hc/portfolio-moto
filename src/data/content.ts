@@ -122,5 +122,4 @@ export const ride = {
   nozzle: "lift the nozzle to copy my email",
   body: "Open to new frontend roles and interesting projects. Tell me what you're building.",
   note: "I reply fast",
-  marquee: ["Build fast", "Ship clean", "Ride often", "React", "Next.js", "TypeScript"],
 };
